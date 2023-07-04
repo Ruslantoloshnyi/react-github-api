@@ -1,19 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Github.css";
 
 function Github() {
   const [selectUser, setSelectUser] = useState(null);
-  const users = ["Dimich", "Artem"];
+  const [usersData, setUsersData] = useState([]);
+
+  useEffect(() => {
+    if (selectUser) {
+      document.title = selectUser;
+    }
+  }, [selectUser]);
+
+  useEffect(() => {
+    fetch("https://api.github.com/search/users?q=it-kamasutra")
+      .then((response) => response.json())
+      .then((data) => {
+        // Обработка полученных данных
+        setUsersData(data.items);
+      })
+      .catch((error) => {
+        // Обработка ошибок
+        console.error(error);
+      });
+  }, []);
+  const users = usersData;
   const newUsers = users.map(function (item) {
     return (
       <li
+        key={usersData.id}
         className={selectUser === item ? "check" : ""}
         onClick={() => {
-          setSelectUser(item);
-          document.title = item;
+          setSelectUser(item.login);
+          //   document.title = item;
         }}
       >
-        {item}
+        {item.login}
       </li>
     );
   });
