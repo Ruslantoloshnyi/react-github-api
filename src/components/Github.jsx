@@ -4,6 +4,7 @@ import "./Github.css";
 function Github() {
   const [selectUser, setSelectUser] = useState(null);
   const [usersData, setUsersData] = useState([]);
+  const [tempSearch, setTempSearch] = useState("");
 
   useEffect(() => {
     if (selectUser) {
@@ -23,6 +24,7 @@ function Github() {
         console.error(error);
       });
   }, []);
+
   const users = usersData;
   const newUsers = users.map(function (item) {
     return (
@@ -39,11 +41,36 @@ function Github() {
     );
   });
 
+  function inputHandler(event) {
+    setTempSearch(event.currentTarget.value);
+  }
+
+  function findHandler() {
+    fetch("https://api.github.com/search/users?q=" + tempSearch)
+      .then((response) => response.json())
+      .then((data) => {
+        // Обработка полученных данных
+        setUsersData(data.items);
+      })
+      .catch((error) => {
+        // Обработка ошибок
+        console.error(error);
+      });
+  }
+
+  console.log(tempSearch);
+
   return (
     <div className="container">
       <div>
         <div>
-          <input type="text" placeholder="search" /> <button>Find</button>
+          <input
+            onChange={inputHandler}
+            value={tempSearch}
+            type="text"
+            placeholder="search"
+          />{" "}
+          <button onClick={findHandler}>Find</button>
         </div>
         <ul>{newUsers}</ul>
       </div>
